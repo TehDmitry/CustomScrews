@@ -14,7 +14,10 @@ _module_dir = os.path.abspath(os.path.join(_script_dir, "modules"))
 sys.path.append(_module_dir)
 
 from .screw import Screw
-import requests
+#import requests
+
+import json
+
 import logging
 from pathlib import Path
 
@@ -120,6 +123,7 @@ lastThreadLength = 0
 lastBodyLength = 0
 textArea = ""
 
+addin_path = os.path.dirname(os.path.realpath(__file__)) 
 
 def addRow(tableInput, inputs, preset):
     global rowNumber
@@ -152,25 +156,37 @@ def addRow(tableInput, inputs, preset):
 def getPresetParameters():
     global HOST
     try:
-        r = requests.get(HOST + "/user/all/screws/")    # http://adsk.hk-fs.de localhost:5000
-        return r.json()
-    except:
-        return None
+        # r = requests.get(HOST + "/user/all/screws/")    # http://adsk.hk-fs.de localhost:5000
+        # return r.json()
+        f = open(addin_path + '/all_screws.json')
+        data = json.load(f)
+        f.close()
 
+        return data.json()
+    except BaseException as ex:
+        ui.messageBox(ex)
+        return None
 
 def getPresetParametersByUserId(userId):
     # app.currentUser.displayName
     global HOST
     try:
-        r = requests.get(HOST + "/user/" + userId +
-                         "/screws/")    # http://adsk.hk-fs.de localhost:5000
-        return r.json()
-    except:
+        # r = requests.get(HOST + "/user/" + userId +
+        #                  "/screws/")    # http://adsk.hk-fs.de localhost:5000
+        # return r.json()
+        f = open(addin_path + '/all_screws.json')
+        data = json.load(f)
+        f.close()
+
+        return data
+    except BaseException as ex:
+        ui.messageBox(ex)
         return None
 
 
 def registerUser(payload):
     global HOST
+    return
     try:
         r = requests.post(HOST + '/users/', json=payload)
         return r.json()
@@ -181,6 +197,7 @@ def registerUser(payload):
 def publishScrewByUserId(userId, payload):
     global HOST
     # app.currentUser.displayName
+    return
     try:
         r = requests.post(HOST + "/user/" + userId + "/screws/", json=payload)
         return r.json()
@@ -191,6 +208,7 @@ def publishScrewByUserId(userId, payload):
 def putScrewByUserId(userId, screwId, payload):
     global HOST
     # app.currentUser.displayName
+    return
     try:
         r = requests.put(HOST + "/user/" + userId + "/screw/" + screwId, json=payload)
         return r.json()
@@ -201,6 +219,7 @@ def putScrewByUserId(userId, screwId, payload):
 def publishScrewLength(screwId, payload):
     global HOST
     # app.currentUser.displayName
+    return
     try:
         r = requests.post(HOST + "/screw/" + screwId + "/length/", json=payload)
         return r.json()
