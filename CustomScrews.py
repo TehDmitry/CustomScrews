@@ -530,6 +530,7 @@ class CommandExecutePreviewHandler(adsk.core.CommandEventHandler):
                 newComp.bRepBodies.item(0).isVisible = False
             eventArgs.isValidResult = True
         except Exception as e:
+            ui.messageBox(e)
             logging.error(f'CommandExecutePreviewHandler {e}')
 
 
@@ -568,10 +569,24 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                 elif input.id == 'chamferDistance':
                     screw.chamferDistance = unitsMgr.evaluateExpression(input.expression, "mm")
 
+            jointSelection = inputs.itemById('jointSelection')
+            jointSelections = []
+            for j in range(0, jointSelection.selectionCount):
+                jointSelections.append(jointSelection.selection(j))
+
             screw.sketch()
+
+            for j in range(0, len(jointSelections)):
+                joinComp = screw.copy()
+                screw.joinScrew(jointSelections[j], joinComp)
+                j = j + 1
+            if jointSelection.selectionCount > 0:
+                newComp.bRepBodies.item(0).isVisible = False
+
             args.isValidResult = True
-            logging.debug(_('command: {} executed successfully').format(eventArgs.command.parentCommandDefinition.id))
+            logging.debug(('command: {} executed successfully').format(eventArgs.command.parentCommandDefinition.id))
         except Exception as e:
+            ui.messageBox(e)
             logging.error(f'CommandExecuteHandler {e}')
 
 
